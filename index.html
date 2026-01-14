@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saat Uygulamam</title>
+    <title>Sezer Çalt - Saat</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body {
@@ -20,11 +20,21 @@
         #saat {
             font-size: 5rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
         }
         #tarih {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        #isim {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #38bdf8; /* Açık mavi tonu */
+            letter-spacing: 2px;
+            border-top: 1px solid #334155;
+            padding-top: 10px;
         }
     </style>
 </head>
@@ -32,18 +42,17 @@
 
     <div id="saat">00:00:00</div>
     <div id="tarih">Yükleniyor...</div>
+    <div id="isim">SEZER ÇALT</div>
 
     <script>
         function zamaniGuncelle() {
             const simdi = new Date();
             
-            // Saat formatı
             const saat = simdi.getHours().toString().padStart(2, '0');
             const dakika = simdi.getMinutes().toString().padStart(2, '0');
             const saniye = simdi.getSeconds().toString().padStart(2, '0');
             document.getElementById('saat').textContent = `${saat}:${dakika}:${saniye}`;
 
-            // Tarih formatı
             const secenekler = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('tarih').textContent = simdi.toLocaleDateString('tr-TR', secenekler);
         }
@@ -51,7 +60,6 @@
         setInterval(zamaniGuncelle, 1000);
         zamaniGuncelle();
 
-        // PWA için Service Worker kaydı
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
