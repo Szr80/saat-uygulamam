@@ -3,80 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sezer Çalt - Akıllı Saat</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body {
-            background-color: #0f172a;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            text-align: center;
-        }
-        #saat { font-size: 5rem; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
-        #tarih { font-size: 1.2rem; color: #94a3b8; margin-bottom: 20px; }
-        #isim { font-size: 1.5rem; color: #38bdf8; letter-spacing: 2px; border-top: 1px solid #334155; padding-top: 10px; }
-        button {
-            margin-top: 30px;
-            padding: 10px 20px;
-            background-color: #38bdf8;
-            border: none;
-            border-radius: 5px;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
+    <title>Yavru Uygulama</title>
 </head>
-<body>
+<body style="background:#121212; color:white; text-align:center; font-family:sans-serif; padding-top:50px;">
 
-    <div id="saat">00:00:00</div>
-    <div id="tarih">Yükleniyor...</div>
-    <div id="isim">SEZER ÇALT</div>
+    <h1>Yavru Uygulama</h1>
+    <p>Sezer Çalt Bildirim Sistemi</p>
     
-    <button onclick="bildirimIzniniAl()">Bildirimleri Aktif Et</button>
+    <button id="izinButon" style="padding:15px; background:#00ff00; border:none; border-radius:10px; font-weight:bold;">
+        BİLDİRİMLERİ AÇ
+    </button>
 
     <script type="module">
-        // Firebase Modülleri
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
-        // Firebase Ayarların (Burayı Kendi Bilgilerinle Doldur)
         const firebaseConfig = {
-            apiKey: "AIzaSy...",
-            authDomain: "projen.firebaseapp.com",
-            projectId: "projen-id",
-            storageBucket: "projen.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:12345:web:abcde"
+            apiKey: "BURAYA_API_KEY",
+            authDomain: "PROJE_ID.firebaseapp.com",
+            projectId: "PROJE_ID",
+            storageBucket: "PROJE_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
 
-        // Bildirim İzni Alma Fonksiyonu
-        window.bildirimIzniniAl = function() {
+        document.getElementById('izinButon').onclick = () => {
             Notification.requestPermission().then((permission) => {
                 if (permission === 'granted') {
-                    getToken(messaging, { vapidKey: 'BURAYA_FIREBASE_VAPID_KEY_GELECEK' })
-                    .then((token) => {
-                        console.log("Token Alındı: ", token);
-                        alert("Bildirimler aktif edildi! Artık mesaj alabilirsin.");
+                    getToken(messaging, { vapidKey: 'BURAYA_VAPID_KEY' }).then((t) => {
+                        console.log("TOKEN:", t);
+                        alert("BAŞARILI! Artık bu sayfayı kapatabilirsin.");
                     });
-                } else {
-                    alert("Bildirim izni reddedildi.");
                 }
             });
         };
-
-        // Saat Güncelleme Mantığı
-        function zamaniGuncelle() {
-            const simdi = new Date();
-            document.getElementById('saat').textContent = simdi.toLocaleTimeString('tr-TR');
-            const secenekler = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('tarih').textContent = simdi.toLocaleDateString('tr-TR', secenekler);
+    </script>
+</body>
+</html>
