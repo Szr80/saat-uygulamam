@@ -7,32 +7,70 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Yavru Saat</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <title>Yavru Saat Uygulaması</title>
 
     <style>
         body { 
-            background: #0f172a; color: white; font-family: sans-serif; 
-            text-align: center; height: 100vh; display: flex; 
-            flex-direction: column; justify-content: center; margin: 0;
-            user-select: none; -webkit-tap-highlight-color: transparent;
+            background: #0f172a; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            text-align: center; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
         }
-        #saat { font-size: 5rem; color: #38bdf8; font-weight: bold; }
-        #mesajEkrani { 
-            font-size: 1.8rem; margin: 20px; color: #facc15; 
-            background: rgba(255,255,255,0.05); padding: 25px; 
-            border-radius: 20px; border: 1px dashed #38bdf8;
+        #saat { 
+            font-size: 5.5rem; 
+            color: #38bdf8; 
+            font-weight: bold; 
+            text-shadow: 0 0 25px rgba(56,189,248,0.4);
+        }
+        #tarih {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+        #mesajKutusu { 
+            font-size: 1.8rem; 
+            margin: 0 25px; 
+            color: #facc15; 
+            background: rgba(255,255,255,0.07); 
+            padding: 30px; 
+            border-radius: 25px; 
+            border: 2px solid #38bdf8;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .etiket {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #38bdf8;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
     <div id="saat">00:00:00</div>
-    <div id="mesajEkrani">Sistem mesajı bekleniyor...</div>
+    <div id="tarih">---</div>
+
+    <div id="mesajKutusu">
+        <div class="etiket">Ana Uygulamadan Mesaj</div>
+        <div id="gelenMesaj">Bağlantı kuruluyor...</div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // Senin özel veritabanı adresin
         const firebaseConfig = {
             databaseURL: "https://ana-uygulama-f22cb-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
@@ -40,19 +78,27 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Saati her saniye güncelle
-        setInterval(() => {
-            document.getElementById('saat').innerText = new Date().toLocaleTimeString('tr-TR');
-        }, 1000);
+        // Saat ve Tarih Güncelleme
+        function guncelle() {
+            const simdi = new Date();
+            document.getElementById('saat').innerText = simdi.toLocaleTimeString('tr-TR');
+            document.getElementById('tarih').innerText = simdi.toLocaleDateString('tr-TR', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+        }
+        setInterval(guncelle, 1000);
+        guncelle();
 
-        // Ana uygulamadan gelen veriyi dinle
-        onValue(ref(db, 'ortakKanal'), (snapshot) => {
+        // ANA UYGULAMADAN MESAJI AL
+        const mesajRef = ref(db, 'ortakKanal');
+        onValue(mesajRef, (snapshot) => {
             const data = snapshot.val();
-            if (data) {
-                document.getElementById('mesajEkrani').innerText = data.metin;
+            if (data && data.metin) {
+                document.getElementById('gelenMesaj').innerText = data.metin;
+            } else {
+                document.getElementById('gelenMesaj').innerText = "Mesaj yok.";
             }
         });
     </script>
 </body>
 </html>
-
