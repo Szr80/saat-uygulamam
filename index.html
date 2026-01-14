@@ -1,103 +1,41 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yavru Uygulama - Akıllı Saat</title>
+    <title>Yavru Uygulama (Saat)</title>
     <style>
-        body { 
-            background-color: #0f172a; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-        #saat { 
-            font-size: 6rem; 
-            font-weight: bold; 
-            color: #38bdf8; 
-            text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
-            margin-bottom: 10px;
-        }
-        #tarih { 
-            font-size: 1.5rem; 
-            color: #94a3b8; 
-            margin-bottom: 40px;
-        }
-        /* Ana Uygulamadan Gelen Mesaj Kutusu */
-        #mesajAlani {
-            background: rgba(30, 41, 59, 0.7);
-            padding: 20px 40px;
-            border-radius: 20px;
-            border: 2px solid #38bdf8;
-            max-width: 80%;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            animation: glow 2s infinite alternate;
-        }
-        @keyframes glow {
-            from { box-shadow: 0 0 10px #38bdf8; }
-            to { box-shadow: 0 0 25px #38bdf8; }
-        }
-        #gelenMesaj { 
-            font-size: 1.8rem; 
-            font-weight: 500; 
-            color: #ffffff;
-        }
-        .etiket { font-size: 0.8rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; margin: 0; }
+        #saat { font-size: 5rem; color: #38bdf8; font-weight: bold; }
+        #mesajEkrani { font-size: 2rem; margin-top: 20px; color: #facc15; font-style: italic; }
     </style>
 </head>
 <body>
-
     <div id="saat">00:00:00</div>
-    <div id="tarih">Yükleniyor...</div>
-
-    <div id="mesajAlani">
-        <div class="etiket">Sistem Mesajı</div>
-        <div id="gelenMesaj">Ana uygulama bekleniyor...</div>
-    </div>
+    <div id="mesajEkrani">Ana uygulamadan mesaj bekleniyor...</div>
 
     <script type="module">
-        // 1. Firebase Kütüphanelerini Yükle
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 2. Kendi Bilgilerinle Doldur (DİKKAT: Admin panelindeki ile AYNI olmalı)
         const firebaseConfig = {
-            apiKey: "SENİN_API_KEY",
-            databaseURL: "https://PROJE-ID-default-rtdb.firebaseio.com/", // https:// ile başlayan link
-            projectId: "PROJE-ID",
-            storageBucket: "PROJE-ID.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
+            databaseURL: "https://ana-uygulama-f22cb-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
 
-        // 3. Firebase'i Başlat
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- SAAT FONKSİYONU ---
-        function saatiGuncelle() {
-            const simdi = new Date();
-            document.getElementById('saat').textContent = simdi.toLocaleTimeString('tr-TR');
-            document.getElementById('tarih').textContent = simdi.toLocaleDateString('tr-TR', { 
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-            });
-        }
-        setInterval(saatiGuncelle, 1000);
-        saatiGuncelle();
+        // Saati Çalıştır
+        setInterval(() => {
+            document.getElementById('saat').innerText = new Date().toLocaleTimeString();
+        }, 1000);
 
-        // --- CANLI MESAJ DİNLEME (ANA UYGULAMADAN GELEN) ---
-        const mesajRef = ref(db, 'canliMesaj');
-        onValue(mesajRef, (snapshot) => {
+        // ANA UYGULAMAYI DİNLE
+        onValue(ref(db, 'ortakKanal'), (snapshot) => {
             const data = snapshot.val();
-            if (data && data.metin) {
-                document.getElementById('gelenMesaj').innerText = data.metin;
-                
-                // Yeni mesaj geldiğinde ekranı hafifçe titret (Dikkat çeksin)
-                document.getElementById('mesajAlani').style.transform = "scale(1.
+            if (data) {
+                document.getElementById('mesajEkrani').innerText = data.metin;
+            }
+        });
+    </script>
+</body>
+</html>
