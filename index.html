@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Yavru Saat</title>
+
+    <style>
+        body { 
+            background: #0f172a; color: white; font-family: sans-serif; 
+            text-align: center; height: 100vh; display: flex; 
+            flex-direction: column; justify-content: center; margin: 0;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        #saat { font-size: 5rem; color: #38bdf8; font-weight: bold; }
+        #mesajEkrani { 
+            font-size: 1.8rem; margin: 20px; color: #facc15; 
+            background: rgba(255,255,255,0.05); padding: 25px; 
+            border-radius: 20px; border: 1px dashed #38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="saat">00:00:00</div>
+    <div id="mesajEkrani">Sistem mesajı bekleniyor...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            databaseURL: "https://ana-uygulama-f22cb-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Saati her saniye güncelle
+        setInterval(() => {
+            document.getElementById('saat').innerText = new Date().toLocaleTimeString('tr-TR');
+        }, 1000);
+
+        // Ana uygulamadan gelen veriyi dinle
+        onValue(ref(db, 'ortakKanal'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('mesajEkrani').innerText = data.metin;
+            }
+        });
+    </script>
+</body>
+</html>
 
