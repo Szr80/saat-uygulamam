@@ -1,41 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <title>Yavru Uygulama (Saat)</title>
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; margin: 0; }
-        #saat { font-size: 5rem; color: #38bdf8; font-weight: bold; }
-        #mesajEkrani { font-size: 2rem; margin-top: 20px; color: #facc15; font-style: italic; }
+        #saat { font-size: 5rem; color: #38bdf8; font-weight: bold; text-shadow: 0 0 20px rgba(56,189,248,0.5); }
+        #mesajEkrani { font-size: 2rem; margin-top: 20px; color: #facc15; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-inline: 20px; }
     </style>
 </head>
 <body>
-    <div id="saat">00:00:00</div>
-    <div id="mesajEkrani">Ana uygulamadan mesaj bekleniyor...</div>
+    <div id="saat">Yükleniyor...</div>
+    <div id="mesajEkrani">Ana uygulama bekleniyor...</div>
 
     <script type="module">
+        // Firebase Modülleri
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // Senin verdiğin veritabanı adresi
         const firebaseConfig = {
             databaseURL: "https://ana-uygulama-f22cb-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
 
-        // Saati Çalıştır
-        setInterval(() => {
-            document.getElementById('saat').innerText = new Date().toLocaleTimeString();
-        }, 1000);
+            // SAAT FONKSİYONU (Hata alsa bile saatin çalışması için try-catch dışında)
+            setInterval(() => {
+                const simdi = new Date();
+                document.getElementById('saat').innerText = simdi.toLocaleTimeString('tr-TR');
+            }, 1000);
 
-        // ANA UYGULAMAYI DİNLE
-        onValue(ref(db, 'ortakKanal'), (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                document.getElementById('mesajEkrani').innerText = data.metin;
-            }
-        });
+            // ANA UYGULAMAYI DİNLE
+            const kanalRef = ref(db, 'ortakKanal');
+            onValue(kanalRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.metin) {
+                    document.getElementById('mesajEkrani').innerText = data.metin;
+                }
+            }, (error) => {
+                console.error("Firebase Hatası:", error);
+                document.getElementById('mesajEkrani').innerText = "Bağlantı Hatası!";
+            });
+
+        } catch (hata) {
+            console.error("Başlatma Hatası:", hata);
+            document.getElementById('saat').innerText = "SİSTEM HATASI";
+        }
     </script>
 </body>
 </html>
