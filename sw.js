@@ -1,4 +1,4 @@
-// Service Worker: Arka Plan Bildirim Yöneticisi
+// Service Worker (Arka Plan Bildirim Bekçisi)
 self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
@@ -7,7 +7,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(clients.claim());
 });
 
-// Bildirime tıklandığında uygulamayı açan kod
+// Bildirime tıklandığında uygulamayı aç
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     event.waitUntil(
